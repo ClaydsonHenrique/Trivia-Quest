@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import reducerEmail from './jogo';
 
-const reducer = combineReducers({
+const rootReducer = combineReducers({
   email: reducerEmail,
 });
-export default reducer;
+
+export default rootReducer;
