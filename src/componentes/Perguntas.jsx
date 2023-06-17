@@ -195,4 +195,5 @@ Perguntas.propTypes = {
     push: PropTypes.func,
   }).isRequired,
   score: PropTypes.number.isRequired,
+  assertions: PropTypes.number.isRequired,
 };
