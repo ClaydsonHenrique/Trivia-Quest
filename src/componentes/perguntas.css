@@ -1,7 +1,4 @@
-.correta{
-border:3px solid rgb(6, 240, 15)
+.correta, .errada {
+border:1px solid black
 }
 
-.errada{
-border:3px solid red
-}

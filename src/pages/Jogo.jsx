@@ -4,11 +4,12 @@ import Perguntas from '../componentes/Perguntas';
 
 export default class Jogo extends Component {
   render() {
+    const { history } = this.props;
     return (
       <div>
         <h1>jogo</h1>
         <Header />
-        <Perguntas />
+        <Perguntas history={ history } />
       </div>
     );
   }

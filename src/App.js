@@ -5,6 +5,7 @@ import './App.css';
 import Login from './pages/Login';
 import Jogo from './pages/Jogo';
 import Confing from './pages/Confing';
+import Feedback from './pages/Feedback';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route exact path="/" component={ Login } />
           <Route exact path="/jogo" component={ Jogo } />
           <Route exact path="/settings" component={ Confing } />
+          <Route exact path="/feedback" component={ Feedback } />
         </Switch>
       </header>
     </div>

@@ -1,9 +1,8 @@
-import { GET_APP, ADD_NAME, ADD_SCORE } from '../action/index';
+import { GET_APP, ADD_NAME } from '../action/index';
 
 const INITIAL_STATE = {
   email: '',
   name: '',
-  score: 0,
 };
 
 const reducerEmail = (state = INITIAL_STATE, action) => {
@@ -17,11 +16,6 @@ const reducerEmail = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       name: action.payload,
-    };
-  case ADD_SCORE:
-    return {
-      ...state,
-      score: action.payload,
     };
   default:
     return state;

@@ -15,3 +15,9 @@ export const addscore = (token) => ({
   type: ADD_SCORE,
   payload: token,
 });
+
+export const ADD_TIME = 'ADD_SCORE';
+export const addtime = (time) => ({
+  type: ADD_TIME,
+  payload: time,
+});

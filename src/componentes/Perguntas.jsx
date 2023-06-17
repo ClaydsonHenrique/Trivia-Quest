@@ -1,117 +1,194 @@
 import React, { Component } from 'react';
 import './perguntas.css';
+import { connect } from 'react-redux';
+import { addscore } from '../redux/action';
+
+const seconds = 1000;
 
 class Perguntas extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      verde: '',
-      vermelho: '',
-      answer: 0,
+      time: 30,
+      questionIndex: 0,
+      results: [],
       correta: '',
-      errada: [],
-      categoria: '',
-      dificuldade: '',
-      questao: '',
-      type: '',
+      timerId: null,
+      disabled: false,
     };
   }
 
   async componentDidMount() {
     await this.getAnswer();
+    this.startTimer();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { answer } = this.state;
-    if (prevState.answer !== answer) {
-      this.getAnswer();
-    }
+  componentWillUnmount() {
+    this.stopTimer();
   }
 
   getAnswer = async () => {
-    const { history } = this.props;
     const token = localStorage.getItem('token');
     const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
     const { results } = data;
-
+    const { history } = this.props;
     if (results.length === 0) {
-      localStorage.clear();
       history.push('/');
-    } else {
-      const btns = document.querySelectorAll('.btn');
-      btns.forEach((btn) => {
-        btn.classList.remove('errada', 'correta');
-      });
-
-      this.renderAnswer(results);
+      localStorage.clear();
     }
+    this.setState({ results });
   };
 
-  renderAnswer = (results) => {
-    const { answer } = this.state;
-    if (results[answer]) {
-      const {
-        category, difficulty, question, type,
-      } = results[answer];
-
-      this.setState({
-        correta: results[answer].correct_answer,
-        errada: results[answer].incorrect_answers,
-        categoria: category,
-        dificuldade: difficulty,
-        questao: question,
-        type,
+  renderAnswer = () => {
+    const { questionIndex, results } = this.state;
+    if (questionIndex <= 4) {
+      const { category, question } = results[questionIndex];
+      const correctQuestion = results[questionIndex].correct_answer;
+      const incorrectAnswers = results[questionIndex].incorrect_answers;
+      const allAnswers = [...this.renderAnswersIncorrect(incorrectAnswers),
+        this.renderAnwerCorrect(correctQuestion)];
+      const styleErro = document.querySelectorAll('.errada');
+      styleErro.forEach((styles) => {
+        styles.style.border = '1px solid black';
       });
-      console.log(results[answer]);
+      return (
+        <div>
+          <h1 data-testid="question-category">{category}</h1>
+          <h3 data-testid="question-text">{question}</h3>
+          <div data-testid="options">
+            {allAnswers.map((answer) => answer)}
+          </div>
+        </div>
+      );
     }
+    const { history } = this.props;
+    console.log('entrou fedback');
+    history.push('/feedback');
   };
 
-  handleClick = ({ target }) => {
-    console.log(target.textContent);
-    const { correta, answer } = this.state;
-    const btns = document.querySelectorAll('.btn');
-    btns.forEach((btn) => {
-      console.log(btns);
-      if (btn.textContent === correta) {
-        btn.classList.add('correta');
-      } else if (btn.textContent !== correta) {
-        btn.classList.add('errada');
-      }
-    });
-
-    this.setState({ answer: answer + 1 });
-  };
-
-  renderAnserwer = () => {
-    const { correta, errada, categoria, dificuldade, questao } = this.state;
-    const questoes = [...errada, correta];
-    const number = 0.5;
-    const questoesAleatoria = questoes.sort(() => Math.random() - number);
+  renderAnwerCorrect = (param) => {
+    const { disabled } = this.state;
+    const borda = disabled ? { border: '3px solid rgb(6, 240, 15)' } : {};
     return (
-      <div>
-        <h1 data-testid="question-category">{categoria}</h1>
-        <h3 data-testid="question-text">{questao}</h3>
-        {questoesAleatoria.map((erro, index) => (
-          <button
-            key={ index }
-            onClick={ this.handleClick }
-            className="btn"
-            data-testid={ erro === correta ? 'correct-answer' : `wrong-answer-${index}` }
-          >
-            {erro}
-
-          </button>
-        ))}
-      </div>
+      <button
+        style={ borda }
+        disabled={ disabled }
+        onClick={ this.handleClick }
+        className="correta"
+        data-testid="correct-answer"
+      >
+        { param}
+      </button>
     );
   };
 
-  render() {
+  renderAnswersIncorrect = (param) => param.map((btn, index) => {
+    const { disabled } = this.state;
+    const borda = disabled ? { border: '3px solid red' } : {};
     return (
-      <div>{this.renderAnserwer()}</div>
+      <button
+        style={ borda }
+        disabled={ disabled }
+        className="errada"
+        onClick={ this.handleClick }
+        key={ index }
+        data-testid={ `wrong-answer-${index}` }
+      >
+        {btn}
+
+      </button>
+    );
+  });
+
+  handleClick = ({ target }) => {
+    const { questionIndex, results, time } = this.state;
+    const { dispatch, score } = this.props;
+    const correta = results[questionIndex].correct_answer;
+    console.log(correta);
+    const dificuldade = results[questionIndex].difficulty;
+    const nivel = { hard: 3, medium: 2, easy: 1 };
+    if (target.innerText === correta) {
+      const scores = (10 + (time * nivel[dificuldade]));
+      const somaScore = score + scores;
+      console.log(somaScore);
+      dispatch(addscore(somaScore));
+      console.log('acertou');
+    } else {
+      console.log('errou');
+    }
+    this.setState({ disabled: true });
+    const styleErro = document.querySelectorAll('.errada');
+    styleErro.forEach((styles) => {
+      styles.style.border = '3px solid red';
+    });
+    this.stopTimer();
+  };
+
+  startTimer = () => {
+    const timerId = setTimeout(this.handleTimeout, seconds);
+    this.setState({ timerId });
+  };
+
+  stopTimer = () => {
+    const { timerId } = this.state;
+    clearTimeout(timerId);
+  };
+
+  handleTimeout = () => {
+    const { time } = this.state;
+
+    this.setState({ time: time - 1 }, () => {
+      if (time <= 1) {
+        this.setState(
+          { disabled: true },
+        );
+        this.stopTimer();
+      } else if (time > 0) {
+        this.setState(
+          { disabled: false },
+        );
+      }
+    });
+
+    this.startTimer();
+  };
+
+  nextQuestion = () => {
+    const { questionIndex, disabled } = this.state;
+    if (disabled) {
+      this.setState({ questionIndex: questionIndex + 1, time: 30 });
+    }
+    this.startTimer();
+  };
+
+  render() {
+    const { results, time, disabled } = this.state;
+    return (
+      <div>
+        <h3>{time}</h3>
+        {results.length > 0 ? (
+          this.renderAnswer(results)
+        ) : (
+          'Carregando...'
+        )}
+        {disabled ? (
+          <button
+            onClick={ this.nextQuestion }
+            data-testid="btn-next"
+            className="next"
+          >
+            Next
+
+          </button>
+        ) : ''}
+      </div>
     );
   }
 }
 
-export default Perguntas;
+const mapStateToProps = (state) => ({
+  score: state.player.score,
+});
+
+export default connect(mapStateToProps)(Perguntas);

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { MD5 } from 'crypto-js';
 
@@ -23,7 +24,12 @@ class Header extends Component {
 const mapStateToProps = (state) => ({
   email: state.email.email,
   name: state.email.name,
-  score: state.email.score,
+  score: state.player.score,
 });
 
 export default connect(mapStateToProps)(Header);
+Header.propTypes = {
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  score: PropTypes.number.isRequired,
+};
