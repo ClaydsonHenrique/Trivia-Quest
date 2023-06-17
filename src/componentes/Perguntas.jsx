@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './perguntas.css';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { addscore } from '../redux/action';
 
 const seconds = 1000;
@@ -12,7 +13,6 @@ class Perguntas extends Component {
       time: 30,
       questionIndex: 0,
       results: [],
-      correta: '',
       timerId: null,
       disabled: false,
     };
@@ -42,7 +42,8 @@ class Perguntas extends Component {
 
   renderAnswer = () => {
     const { questionIndex, results } = this.state;
-    if (questionIndex <= 4) {
+    const number = 4;
+    if (questionIndex <= number) {
       const { category, question } = results[questionIndex];
       const correctQuestion = results[questionIndex].correct_answer;
       const incorrectAnswers = results[questionIndex].incorrect_answers;
@@ -109,7 +110,8 @@ class Perguntas extends Component {
     const dificuldade = results[questionIndex].difficulty;
     const nivel = { hard: 3, medium: 2, easy: 1 };
     if (target.innerText === correta) {
-      const scores = (10 + (time * nivel[dificuldade]));
+      const magicNumber = 10;
+      const scores = (magicNumber + (time * nivel[dificuldade]));
       const somaScore = score + scores;
       console.log(somaScore);
       dispatch(addscore(somaScore));
@@ -157,7 +159,7 @@ class Perguntas extends Component {
   nextQuestion = () => {
     const { questionIndex, disabled } = this.state;
     if (disabled) {
-      this.setState({ questionIndex: questionIndex + 1, time: 30 });
+      this.setState({ questionIndex: questionIndex + 1, time: 30, disabled: false });
     }
     this.startTimer();
   };
@@ -192,3 +194,10 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(Perguntas);
+Perguntas.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+  score: PropTypes.number.isRequired,
+};
