@@ -48,10 +48,7 @@ class Perguntas extends Component {
       const incorrectAnswers = results[questionIndex].incorrect_answers;
       const allAnswers = [...this.renderAnswersIncorrect(incorrectAnswers),
         this.renderAnwerCorrect(correctQuestion)];
-      const styleErro = document.querySelectorAll('.errada');
-      styleErro.forEach((styles) => {
-        styles.style.border = '1px solid black';
-      });
+
       return (
         <div>
           <h1 data-testid="question-category">{category}</h1>

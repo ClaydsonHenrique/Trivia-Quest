@@ -8,8 +8,6 @@
   "dependencies": {
     "@redux-devtools/extension": "3.2.5",
     "@reduxjs/toolkit": "^1.9.5",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/user-event": "^13.5.0",
     "crypto-js": "^4.1.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -50,7 +48,9 @@
   },
   "devDependencies": {
     "@sheerun/mutationobserver-shim": "0.3.3",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
     "@trybe/eslint-config-frontend": "^1.7.1",
     "cypress": "^10.11.0",
     "cypress-multi-reporters": "^1.6.2",
