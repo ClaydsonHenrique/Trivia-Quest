@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './perguntas.css';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { addscore } from '../redux/action';
+import { addscore, addassertions } from '../redux/action';
 
 const seconds = 1000;
 
@@ -104,26 +104,20 @@ class Perguntas extends Component {
 
   handleClick = ({ target }) => {
     const { questionIndex, results, time } = this.state;
-    const { dispatch, score } = this.props;
+    const { dispatch, score, assertions } = this.props;
     const correta = results[questionIndex].correct_answer;
-    console.log(correta);
     const dificuldade = results[questionIndex].difficulty;
     const nivel = { hard: 3, medium: 2, easy: 1 };
     if (target.innerText === correta) {
       const magicNumber = 10;
       const scores = (magicNumber + (time * nivel[dificuldade]));
       const somaScore = score + scores;
-      console.log(somaScore);
       dispatch(addscore(somaScore));
-      console.log('acertou');
-    } else {
-      console.log('errou');
+      const somaAssertions = assertions + 1;
+      dispatch(addassertions(somaAssertions));
+      console.log(somaAssertions);
     }
     this.setState({ disabled: true });
-    const styleErro = document.querySelectorAll('.errada');
-    styleErro.forEach((styles) => {
-      styles.style.border = '3px solid red';
-    });
     this.stopTimer();
   };
 
@@ -191,6 +185,7 @@ class Perguntas extends Component {
 
 const mapStateToProps = (state) => ({
   score: state.player.score,
+  assertions: state.player.assertions,
 });
 
 export default connect(mapStateToProps)(Perguntas);

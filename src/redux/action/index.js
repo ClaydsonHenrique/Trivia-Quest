@@ -21,3 +21,9 @@ export const addtime = (time) => ({
   type: ADD_TIME,
   payload: time,
 });
+
+export const ADD_ASSERTIONS = 'ADD_ASSERTIONS';
+export const addassertions = (assertions) => ({
+  type: ADD_ASSERTIONS,
+  payload: assertions,
+});

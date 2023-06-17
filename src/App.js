@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Jogo from './pages/Jogo';
 import Confing from './pages/Confing';
 import Feedback from './pages/Feedback';
+import Ranking from './pages/Ranking';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route exact path="/jogo" component={ Jogo } />
           <Route exact path="/settings" component={ Confing } />
           <Route exact path="/feedback" component={ Feedback } />
+          <Route exact path="/ranking" component={ Ranking } />
         </Switch>
       </header>
     </div>
