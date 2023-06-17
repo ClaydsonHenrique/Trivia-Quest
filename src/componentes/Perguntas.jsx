@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './perguntas.css';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { addscore, addassertions } from '../redux/action';
