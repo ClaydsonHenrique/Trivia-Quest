@@ -1,7 +1,6 @@
 import React from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouterAndRedux } from './helpers/renderWithRouterAndRedux'
-import { createMemoryHistory } from 'history';
 import App from '../App';
 
 const initialEntries = '/feedback';

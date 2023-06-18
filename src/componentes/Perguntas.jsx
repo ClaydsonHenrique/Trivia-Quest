@@ -18,8 +18,10 @@ class Perguntas extends Component {
   }
 
   async componentDidMount() {
+    const { dispatch } = this.props;
     await this.getAnswer();
     this.startTimer();
+    dispatch(addscore(0));
   }
 
   componentWillUnmount() {
@@ -41,6 +43,7 @@ class Perguntas extends Component {
 
   renderAnswer = () => {
     const { questionIndex, results } = this.state;
+
     const number = 4;
     if (questionIndex <= number) {
       const { category, question } = results[questionIndex];
@@ -59,8 +62,21 @@ class Perguntas extends Component {
         </div>
       );
     }
+    const { name, score } = this.props;
+    const img = localStorage.getItem('imgGravatar');
+    const rankingString = localStorage.getItem('ranking');
+    let rankingLocal = [];
+
+    if (rankingString) {
+      rankingLocal = JSON.parse(rankingString);
+    }
+
+    const arrayRanking = { name, score, picture: img };
+    rankingLocal.push(arrayRanking);
+    const stringfyRanking = JSON.stringify(rankingLocal);
+    localStorage.setItem('ranking', stringfyRanking);
+
     const { history } = this.props;
-    console.log('entrou fedback');
     history.push('/feedback');
   };
 
@@ -181,6 +197,7 @@ class Perguntas extends Component {
 
 const mapStateToProps = (state) => ({
   score: state.player.score,
+  name: state.email.name,
   assertions: state.player.assertions,
 });
 
@@ -192,4 +209,5 @@ Perguntas.propTypes = {
   }).isRequired,
   score: PropTypes.number.isRequired,
   assertions: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
 };

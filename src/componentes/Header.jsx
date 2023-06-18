@@ -8,6 +8,7 @@ class Header extends Component {
     const { email, name, score } = this.props;
     const hash = MD5(email);
     const string = hash.toString();
+    localStorage.setItem('imgGravatar', `https://www.gravatar.com/avatar/${string}`);
     return (
       <div>
         <img
