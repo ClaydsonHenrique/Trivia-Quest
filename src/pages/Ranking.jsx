@@ -22,8 +22,9 @@ export default class Ranking extends Component {
 
   renderList = () => {
     const { rankings } = this.state;
+    console.log(rankings);
     rankings.sort((a, b) => b.score - a.score);
-
+    console.log(rankings[0].picture);
     return (
       <section>
         {rankings.map(({ name, score, picture }, index) => (
@@ -42,7 +43,7 @@ export default class Ranking extends Component {
     return (
       <div>
         <h1 data-testid="ranking-title">Ranking</h1>
-        {rankings.length > 0 ? this.renderList() : ''}
+        {rankings && rankings.length > 0 ? this.renderList() : ''}
 
         <button
           onClick={ this.handleclickLogin }

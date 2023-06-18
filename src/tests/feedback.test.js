@@ -34,7 +34,6 @@ test('verificando feedback contem os valores corretos do state', async () => {
   expect(name.textContent).toBe('aaaaa')
   expect(text.textContent).toBe('Could be better...')
 
-  console.log(history)
 });
 
 
