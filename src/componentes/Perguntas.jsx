@@ -14,14 +14,28 @@ class Perguntas extends Component {
       results: [],
       timerId: null,
       disabled: false,
+      allAnswe: [],
+      question: '',
+      category: '',
+
+      // randomAnswer: [],
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { dispatch } = this.props;
-    await this.getAnswer();
-    this.startTimer();
+    this.getAnswer();
     dispatch(addscore(0));
+    this.startTimer();
+
+    // this.shuffleArray();
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    const { questionIndex, results } = this.state;
+    if (prevState.questionIndex !== questionIndex) {
+      this.renderAnswer(results);
+    }
   }
 
   componentWillUnmount() {
@@ -34,88 +48,49 @@ class Perguntas extends Component {
     const data = await response.json();
     const { results } = data;
     const { history } = this.props;
-    if (results.length === 0) {
+    if (!results || results.length === 0) {
       history.push('/');
       localStorage.clear();
     }
+    this.renderAnswer(results);
     this.setState({ results });
   };
 
-  renderAnswer = () => {
-    const { questionIndex, results } = this.state;
-
+  renderAnswer = (results) => {
+    const { questionIndex } = this.state;
+    console.log('render');
     const number = 4;
-    if (questionIndex <= number) {
+    if (questionIndex <= number && results.length > 0) {
       const { category, question } = results[questionIndex];
       const correctQuestion = results[questionIndex].correct_answer;
       const incorrectAnswers = results[questionIndex].incorrect_answers;
-      const allAnswers = [...this.renderAnswersIncorrect(incorrectAnswers),
-        this.renderAnwerCorrect(correctQuestion)];
-
-      return (
-        <div>
-          <h1 data-testid="question-category">{category}</h1>
-          <h3 data-testid="question-text">{question}</h3>
-          <div data-testid="options">
-            {allAnswers.map((answer) => answer)}
-          </div>
-        </div>
+      const btnAnswers = incorrectAnswers.map(
+        (answer) => ({ value: answer, correct: false }),
       );
+      btnAnswers.push({ value: correctQuestion, correct: true });
+      const shuffleArray = this.shuffleArray(btnAnswers);
+      this.setState({ category, question, allAnswe: shuffleArray });
+    } else if (questionIndex > number) {
+      const { name, score } = this.props;
+      const img = localStorage.getItem('imgGravatar');
+      const rankingString = localStorage.getItem('ranking');
+      let rankingLocal = [];
+      if (rankingString) {
+        rankingLocal = JSON.parse(rankingString);
+      }
+
+      const arrayRanking = { name, score, picture: img };
+      rankingLocal.push(arrayRanking);
+      const stringfyRanking = JSON.stringify(rankingLocal);
+      localStorage.setItem('ranking', stringfyRanking);
+
+      const { history } = this.props;
+      history.push('/feedback');
     }
-    const { name, score } = this.props;
-    const img = localStorage.getItem('imgGravatar');
-    const rankingString = localStorage.getItem('ranking');
-    let rankingLocal = [];
-
-    if (rankingString) {
-      rankingLocal = JSON.parse(rankingString);
-    }
-
-    const arrayRanking = { name, score, picture: img };
-    rankingLocal.push(arrayRanking);
-    const stringfyRanking = JSON.stringify(rankingLocal);
-    localStorage.setItem('ranking', stringfyRanking);
-
-    const { history } = this.props;
-    history.push('/feedback');
   };
-
-  renderAnwerCorrect = (param) => {
-    const { disabled } = this.state;
-    const borda = disabled ? { border: '3px solid rgb(6, 240, 15)' } : {};
-    return (
-      <button
-        style={ borda }
-        disabled={ disabled }
-        onClick={ this.handleClick }
-        className="correta"
-        data-testid="correct-answer"
-      >
-        { param}
-      </button>
-    );
-  };
-
-  renderAnswersIncorrect = (param) => param.map((btn, index) => {
-    const { disabled } = this.state;
-    const borda = disabled ? { border: '3px solid red' } : {};
-    return (
-      <button
-        style={ borda }
-        disabled={ disabled }
-        className="errada"
-        onClick={ this.handleClick }
-        key={ index }
-        data-testid={ `wrong-answer-${index}` }
-      >
-        {btn}
-
-      </button>
-    );
-  });
 
   handleClick = ({ target }) => {
-    const { questionIndex, results, time } = this.state;
+    const { questionIndex, results, time, disabled } = this.state;
     const { dispatch, score, assertions } = this.props;
     const correta = results[questionIndex].correct_answer;
     const dificuldade = results[questionIndex].difficulty;
@@ -130,6 +105,7 @@ class Perguntas extends Component {
       console.log(somaAssertions);
     }
     this.setState({ disabled: true });
+    console.log(disabled);
     this.stopTimer();
   };
 
@@ -152,13 +128,8 @@ class Perguntas extends Component {
           { disabled: true },
         );
         this.stopTimer();
-      } else if (time > 0) {
-        this.setState(
-          { disabled: false },
-        );
       }
     });
-
     this.startTimer();
   };
 
@@ -170,13 +141,43 @@ class Perguntas extends Component {
     this.startTimer();
   };
 
+  shuffleArray(allAnswe) {
+    if (allAnswe.length > 0) {
+      const shuffledArray = [...allAnswe];
+      for (let i = shuffledArray.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      }
+      return shuffledArray;
+    }
+  }
+
   render() {
-    const { results, time, disabled } = this.state;
+    const { results, time, disabled, question, category, allAnswe } = this.state;
+    const bordaGreen = disabled ? { border: '3px solid rgb(6, 240, 15)' } : {};
+    const bordaRed = disabled ? { border: '3px solid red' } : {};
     return (
       <div>
         <h3>{time}</h3>
-        {results.length > 0 ? (
-          this.renderAnswer(results)
+        {results.length > 0 && question && category ? (
+          <div>
+            <h1 data-testid="question-category">{category}</h1>
+            <h3 data-testid="question-text">{question}</h3>
+            <div data-testid="answer-options">
+              {allAnswe.map((answer, index) => (
+                <button
+                  key={ index }
+                  style={ answer.correct ? bordaGreen : bordaRed }
+                  disabled={ disabled }
+                  onClick={ this.handleClick }
+                  data-testid={ answer.correct ? 'correct-answer'
+                    : 'wrong-answer-' }
+                >
+                  {answer.value}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           'Carregando...'
         )}
