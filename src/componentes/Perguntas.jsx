@@ -17,8 +17,6 @@ class Perguntas extends Component {
       allAnswe: [],
       question: '',
       category: '',
-
-      // randomAnswer: [],
     };
   }
 
@@ -27,8 +25,6 @@ class Perguntas extends Component {
     this.getAnswer();
     dispatch(addscore(0));
     this.startTimer();
-
-    // this.shuffleArray();
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -171,7 +167,7 @@ class Perguntas extends Component {
                   disabled={ disabled }
                   onClick={ this.handleClick }
                   data-testid={ answer.correct ? 'correct-answer'
-                    : 'wrong-answer-' }
+                    : 'wrong-answer' }
                 >
                   {answer.value}
                 </button>
