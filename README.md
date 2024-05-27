@@ -1,4 +1,4 @@
-##Trivia-Quest
+Trivia-Quest
 
 Este projeto é um aplicativo de trivia desenvolvido com React e Redux. Ele permite que os usuários façam login, joguem perguntas de trivia, recebam feedback e vejam o ranking dos melhores jogadores.
 Índice
